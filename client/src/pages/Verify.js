@@ -1,6 +1,6 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import API from "../services/api";
 import AuthCard from "../components/AuthCard";
 import InputField from "../components/InputField";
 import PrimaryButton from "../components/PrimaryButton";
@@ -8,6 +8,7 @@ import PageShell from "../layouts/PageShell";
 
 function Verify() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
@@ -17,12 +18,16 @@ function Verify() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    const emailFromState = location.state?.email;
     const pendingEmail = localStorage.getItem("pendingEmail");
 
-    if (pendingEmail) {
+    if (emailFromState) {
+      setEmail(emailFromState);
+      localStorage.setItem("pendingEmail", emailFromState);
+    } else if (pendingEmail) {
       setEmail(pendingEmail);
     }
-  }, []);
+  }, [location.state]);
 
   const validateForm = () => {
     const newErrors = {};
@@ -52,13 +57,10 @@ function Verify() {
       setMessage("");
       setSuccessMessage("");
 
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/verify",
-        {
-          email,
-          code,
-        }
-      );
+      const response = await API.post("/auth/verify", {
+        email,
+        code,
+      });
 
       setSuccessMessage(
         response.data.message || "Имэйл амжилттай баталгаажлаа."
