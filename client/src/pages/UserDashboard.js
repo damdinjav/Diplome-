@@ -96,37 +96,33 @@ function UserDashboard() {
   return (
     <div style={{ minHeight: "100vh", background: "#f5f5f5", fontFamily: "sans-serif", color: "#222" }}>
 
-      {/* Top Header */}
-      <header style={{ background: "#fff", borderBottom: "1px solid #e5e7eb", position: "sticky", top: 0, zIndex: 40 }}>
-        {/* Top bar */}
-        <div style={{ background: "#1a1a1a", padding: "6px 24px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <span style={{ fontSize: 12, color: "rgba(255,255,255,0.5)" }}>ХАС Генераторын онлайн захиалгын систем</span>
-          <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
-            <span style={{ fontSize: 12, color: "rgba(255,255,255,0.6)", display: "flex", alignItems: "center", gap: 4 }}>
-              <User size={12} /> {user?.fullName}
-            </span>
-            <button onClick={() => { logout(); navigate("/login"); }} style={{ fontSize: 12, color: "#F5A623", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>
-              <LogOut size={12} /> Гарах
-            </button>
-          </div>
+      {/* Top bar */}
+      <div style={{ background: "#1a1a1a", padding: "6px 24px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <span style={{ fontSize: 12, color: "rgba(255,255,255,0.5)" }}>ХАС Генераторын онлайн захиалгын систем</span>
+        <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
+          <span style={{ fontSize: 12, color: "rgba(255,255,255,0.6)", display: "flex", alignItems: "center", gap: 4 }}>
+            <User size={12} /> {user?.fullName}
+          </span>
+          <button onClick={() => { logout(); navigate("/login"); }} style={{ fontSize: 12, color: "#F5A623", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>
+            <LogOut size={12} /> Гарах
+          </button>
         </div>
+      </div>
 
-        {/* Main header */}
-        <div style={{ padding: "12px 24px", display: "flex", alignItems: "center", gap: 24, maxWidth: 1280, margin: "0 auto" }}>
-          {/* Logo */}
-          <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
-            <img src="/xac-logo.png" alt="ХАС" style={{ width: 56, height: 56, objectFit: "cover" }} />
-          </div>
+      {/* Yellow Header */}
+      <header style={{ background: "#F5A623", position: "sticky", top: 0, zIndex: 40 }}>
+        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "12px 24px", display: "flex", alignItems: "center", gap: 20 }}>
+          <img src="/xac-logo.png" alt="ХАС" style={{ width: 48, height: 48, objectFit: "cover", flexShrink: 0 }} />
 
           {/* Search */}
-          <div style={{ flex: 1, display: "flex", maxWidth: 600 }}>
+          <div style={{ flex: 1, display: "flex", maxWidth: 640 }}>
             <input
               value={search}
               onChange={(e) => { setSearch(e.target.value); setProductPage(1); setActiveTab("products"); }}
               placeholder="Генератор хайх... (нэр, брэнд, төрөл)"
-              style={{ flex: 1, border: "2px solid #F5A623", borderRight: "none", borderRadius: "8px 0 0 8px", padding: "10px 16px", fontSize: 14, outline: "none" }}
+              style={{ flex: 1, border: "none", borderRadius: "8px 0 0 8px", padding: "11px 16px", fontSize: 14, outline: "none" }}
             />
-            <button style={{ background: "#F5A623", border: "none", borderRadius: "0 8px 8px 0", padding: "0 20px", cursor: "pointer" }}>
+            <button style={{ background: "#e8950f", border: "none", borderRadius: "0 8px 8px 0", padding: "0 20px", cursor: "pointer" }}>
               <Search size={18} color="#fff" />
             </button>
           </div>
@@ -134,22 +130,25 @@ function UserDashboard() {
           {/* My orders button */}
           <button
             onClick={() => setActiveTab("orders")}
-            style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 20px", borderRadius: 8, border: "1px solid #e5e7eb", background: activeTab === "orders" ? "#F5A623" : "#fff", color: activeTab === "orders" ? "#fff" : "#444", fontWeight: 600, fontSize: 14, cursor: "pointer", flexShrink: 0 }}
+            style={{ position: "relative", display: "flex", alignItems: "center", gap: 8, padding: "10px 18px", borderRadius: 8, border: "none", background: "rgba(0,0,0,0.15)", color: "#fff", fontWeight: 700, fontSize: 13, cursor: "pointer", flexShrink: 0 }}
           >
             <Clock size={16} /> Миний захиалгууд
             {orders.length > 0 && (
-              <span style={{ background: activeTab === "orders" ? "rgba(255,255,255,0.3)" : "#F5A623", color: "#fff", borderRadius: 999, padding: "1px 7px", fontSize: 11, fontWeight: 700 }}>{orders.length}</span>
+              <span style={{ position: "absolute", top: -6, right: -6, background: "#dc2626", color: "#fff", borderRadius: 999, width: 20, height: 20, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 800 }}>
+                {orders.length}
+              </span>
             )}
           </button>
         </div>
 
         {/* Nav tabs */}
-        <div style={{ borderTop: "1px solid #f0f0f0", padding: "0 24px", display: "flex", gap: 0, maxWidth: 1280, margin: "0 auto" }}>
+        <div style={{ borderTop: "1px solid rgba(255,255,255,0.2)", padding: "0 24px", maxWidth: 1280, margin: "0 auto", display: "flex", gap: 0 }}>
           {["products", "orders"].map((tab) => (
             <button key={tab} onClick={() => setActiveTab(tab)} style={{
-              padding: "12px 20px", fontSize: 13, fontWeight: 600, border: "none", background: "none", cursor: "pointer",
-              color: activeTab === tab ? "#F5A623" : "#666",
-              borderBottom: activeTab === tab ? "2px solid #F5A623" : "2px solid transparent",
+              padding: "10px 20px", fontSize: 13, fontWeight: 700, border: "none", background: "none", cursor: "pointer",
+              color: "#fff",
+              borderBottom: activeTab === tab ? "2px solid #fff" : "2px solid transparent",
+              opacity: activeTab === tab ? 1 : 0.8,
             }}>
               {tab === "products" ? "🔧 Генераторууд" : "📋 Захиалгууд"}
             </button>
@@ -187,7 +186,7 @@ function UserDashboard() {
                       onMouseLeave={(e) => e.currentTarget.style.boxShadow = "none"}
                     >
                       {p.image ? (
-                        <img src={"http://localhost:5001" + p.image} alt={p.name} style={{ width: "100%", height: 180, objectFit: "cover" }} />
+                        <img src={"http://localhost:5000" + p.image} alt={p.name} style={{ width: "100%", height: 180, objectFit: "cover" }} />
                       ) : (
                         <div style={{ width: "100%", height: 180, background: "#f9f9f9", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 48 }}>⚡</div>
                       )}
@@ -238,7 +237,7 @@ function UserDashboard() {
                     {paginatedOrders.map((o) => (
                       <div key={o._id} style={{ background: "#fff", borderRadius: 8, border: "1px solid #e5e7eb", padding: 16, display: "flex", alignItems: "center", gap: 16 }}>
                         {o.product?.image && (
-                          <img src={"http://localhost:5001" + o.product.image} alt={o.product?.name} style={{ width: 80, height: 80, objectFit: "cover", borderRadius: 8, border: "1px solid #e5e7eb", flexShrink: 0 }} />
+                          <img src={"http://localhost:5000" + o.product.image} alt={o.product?.name} style={{ width: 80, height: 80, objectFit: "cover", borderRadius: 8, border: "1px solid #e5e7eb", flexShrink: 0 }} />
                         )}
                         <div style={{ flex: 1 }}>
                           <p style={{ fontWeight: 700, fontSize: 15, margin: "0 0 4px" }}>{o.product?.name}</p>
@@ -280,7 +279,7 @@ function UserDashboard() {
               {/* Product info */}
               <div style={{ display: "flex", gap: 12, background: "#f9f9f9", borderRadius: 8, padding: 12, border: "1px solid #e5e7eb" }}>
                 {selectedProduct.image && (
-                  <img src={"http://localhost:5001" + selectedProduct.image} alt={selectedProduct.name} style={{ width: 80, height: 80, objectFit: "cover", borderRadius: 6 }} />
+                  <img src={"http://localhost:5000" + selectedProduct.image} alt={selectedProduct.name} style={{ width: 80, height: 80, objectFit: "cover", borderRadius: 6 }} />
                 )}
                 <div>
                   <p style={{ fontWeight: 700, margin: "0 0 4px" }}>{selectedProduct.name}</p>

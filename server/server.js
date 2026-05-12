@@ -8,7 +8,7 @@ dotenv.config();
 
 const authRoutes = require("./src/routes/authRoutes");
 const productRoutes = require("./src/routes/productRoutes");
-// const orderRoutes = require("./src/routes/orderRoutes");
+const orderRoutes = require("./src/routes/orderRoutes");
 
 const app = express();
 
@@ -23,7 +23,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
-// app.use("/api/orders", orderRoutes);
+app.use("/api/orders", orderRoutes);
 
 mongoose
   .connect(process.env.MONGO_URI)
