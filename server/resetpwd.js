@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 require('dotenv').config();
 
 mongoose.connect(process.env.MONGO_URI).then(async () => {
-  const password = 'Admin@123';
+  const password = 'Aaaa123@';
   const salt = await bcrypt.genSalt(10);
   const hash = await bcrypt.hash(password, salt);
   
@@ -16,7 +16,6 @@ mongoose.connect(process.env.MONGO_URI).then(async () => {
   
   console.log('modified:', result.modifiedCount);
   
-  // Шалгах
   const user = await mongoose.connection.db.collection('users').findOne({ email: 'damdinjavsh672@gmail.com' });
   const match = await bcrypt.compare(password, user.password);
   console.log('match after update:', match);

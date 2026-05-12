@@ -140,30 +140,30 @@ function AdminDashboard() {
       </div>
 
       {/* Header */}
-      <header style={{ background: "#fff", borderBottom: "1px solid #e5e7eb", position: "sticky", top: 0, zIndex: 40 }}>
+      <header style={{ background: "#F5A623", borderBottom: "1px solid #e8950f", position: "sticky", top: 0, zIndex: 40 }}>
         <div style={{ maxWidth: 1280, margin: "0 auto", padding: "12px 24px", display: "flex", alignItems: "center", gap: 16 }}>
           <img src="/xac-logo.png" alt="ХАС" style={{ width: 44, height: 44, objectFit: "cover" }} />
-          <div style={{ width: 1, height: 32, background: "#e5e7eb" }} />
+          <div style={{ width: 1, height: 32, background: "rgba(255,255,255,0.3)" }} />
           <div>
-            <h1 style={{ fontWeight: 800, fontSize: 16, margin: 0, color: '#fff' }}>Админы самбар</h1>
-            <p style={{ fontSize: 12, color: "#999", margin: 0 }}>Захиалга болон бүтээгдэхүүн удирдах</p>
+            <h1 style={{ fontWeight: 800, fontSize: 16, margin: 0, color: "#fff" }}>Админы самбар</h1>
+            <p style={{ fontSize: 12, color: "rgba(255,255,255,0.7)", margin: 0 }}>Захиалга болон бүтээгдэхүүн удирдах</p>
           </div>
         </div>
 
         {/* Nav tabs */}
-        <div style={{ borderTop: "1px solid #f0f0f0", padding: "0 24px", display: "flex", maxWidth: 1280, margin: "0 auto" }}>
+        <div style={{ borderTop: "1px solid rgba(255,255,255,0.2)", padding: "0 24px", display: "flex", maxWidth: 1280, margin: "0 auto" }}>
           {[
             { key: "orders", label: "📋 Захиалгууд", count: orders.length },
             { key: "products", label: "📦 Бүтээгдэхүүн", count: null },
           ].map((tab) => (
             <button key={tab.key} onClick={() => setActiveTab(tab.key)} style={{
               padding: "12px 20px", fontSize: 13, fontWeight: 600, border: "none", background: "none", cursor: "pointer",
-              color: activeTab === tab.key ? "#F5A623" : "#666",
-              borderBottom: activeTab === tab.key ? "2px solid #F5A623" : "2px solid transparent",
+              color: activeTab === tab.key ? "#fff" : "rgba(255,255,255,0.6)",
+              borderBottom: activeTab === tab.key ? "2px solid #fff" : "2px solid transparent",
               display: "flex", alignItems: "center", gap: 6
             }}>
               {tab.label}
-              {tab.count > 0 && <span style={{ background: "#F5A623", color: "#fff", borderRadius: 999, padding: "1px 7px", fontSize: 11, fontWeight: 700 }}>{tab.count}</span>}
+              {tab.count > 0 && <span style={{ background: "rgba(0,0,0,0.2)", color: "#fff", borderRadius: 999, padding: "1px 7px", fontSize: 11, fontWeight: 700 }}>{tab.count}</span>}
             </button>
           ))}
         </div>
@@ -174,7 +174,6 @@ function AdminDashboard() {
           <div style={{ display: "flex", height: 200, alignItems: "center", justifyContent: "center", color: "#999" }}>Уншиж байна...</div>
         ) : (
           <>
-            {/* Orders Tab */}
             {activeTab === "orders" && (
               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                 {paginatedOrders.length === 0 ? (
@@ -208,7 +207,6 @@ function AdminDashboard() {
               </div>
             )}
 
-            {/* Products Tab */}
             {activeTab === "products" && (
               <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
                 <div style={{ display: "flex", justifyContent: "flex-end" }}>
@@ -261,16 +259,14 @@ function AdminDashboard() {
 
       <Footer />
 
-      {/* Product Modal */}
       {modal && (
         <div style={{ position: "fixed", inset: 0, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.5)", padding: 16 }}>
           <div style={{ width: "100%", maxWidth: 480, borderRadius: 12, background: "#fff", overflow: "hidden", boxShadow: "0 25px 60px rgba(0,0,0,0.3)", maxHeight: "90vh", overflowY: "auto" }}>
             <div style={{ background: "#F5A623", padding: "16px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <h2 style={{ fontWeight: 800, fontSize: 16, margin: 0, color: '#fff', color: "#fff" }}>{editProduct ? "Бүтээгдэхүүн засах" : "Бүтээгдэхүүн нэмэх"}</h2>
+              <h2 style={{ fontWeight: 800, fontSize: 16, margin: 0, color: "#fff" }}>{editProduct ? "Бүтээгдэхүүн засах" : "Бүтээгдэхүүн нэмэх"}</h2>
               <button onClick={() => setModal(false)} style={{ background: "none", border: "none", color: "#fff", cursor: "pointer", fontSize: 22 }}>×</button>
             </div>
             <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 14 }}>
-              {/* Image upload */}
               <div>
                 <label style={{ fontSize: 13, fontWeight: 600, color: "#555", display: "block", marginBottom: 6 }}>Зураг</label>
                 <label style={{ cursor: "pointer", display: "block" }}>
@@ -329,4 +325,4 @@ function AdminDashboard() {
   );
 }
 
-export default AdminDashboard;2
+export default AdminDashboard;

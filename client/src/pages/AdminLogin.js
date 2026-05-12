@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Lock, Mail, Shield } from "lucide-react";
 import API from "../services/api";
-import { saveUser } from "../utils/auth";
+import { saveAuth } from "../utils/auth";
 
 function AdminLogin() {
   const navigate = useNavigate();
@@ -33,7 +33,6 @@ function AdminLogin() {
   return (
     <div style={{ minHeight: "100vh", background: "#1a1a1a", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "sans-serif", padding: 16 }}>
       <div style={{ width: "100%", maxWidth: 420 }}>
-        {/* Logo */}
         <div style={{ textAlign: "center", marginBottom: 32 }}>
           <img src="/xac-logo.png" alt="ХАС" style={{ width: 72, height: 72, objectFit: "cover", marginBottom: 12 }} />
           <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(245,166,35,0.15)", border: "1px solid rgba(245,166,35,0.3)", borderRadius: 999, padding: "4px 14px" }}>
@@ -42,7 +41,6 @@ function AdminLogin() {
           </div>
         </div>
 
-        {/* Card */}
         <div style={{ background: "#242424", borderRadius: 16, border: "1px solid rgba(245,166,35,0.15)", padding: 32 }}>
           <h2 style={{ fontWeight: 800, fontSize: 22, color: "#fff", margin: "0 0 8px" }}>Тавтай морил</h2>
           <p style={{ fontSize: 14, color: "rgba(255,255,255,0.4)", margin: "0 0 28px" }}>Админы хяналтын самбарт нэвтрэнэ үү.</p>
@@ -54,7 +52,6 @@ function AdminLogin() {
                 <Mail size={15} color="#F5A623" />
                 <input type="email" placeholder="admin@example.com" value={form.email} onChange={(e) => setForm(p => ({ ...p, email: e.target.value }))}
                   style={{ flex: 1, background: "none", border: "none", outline: "none", fontSize: 14, color: "#fff" }}
-                  className="placeholder-stone-600"
                 />
               </div>
             </div>
@@ -65,7 +62,6 @@ function AdminLogin() {
                 <Lock size={15} color="#F5A623" />
                 <input type={showPass ? "text" : "password"} placeholder="Нууц үг" value={form.password} onChange={(e) => setForm(p => ({ ...p, password: e.target.value }))}
                   style={{ flex: 1, background: "none", border: "none", outline: "none", fontSize: 14, color: "#fff" }}
-                  className="placeholder-stone-600"
                 />
                 <button type="button" onClick={() => setShowPass(s => !s)} style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(245,166,35,0.5)" }}>
                   {showPass ? <EyeOff size={15} /> : <Eye size={15} />}
