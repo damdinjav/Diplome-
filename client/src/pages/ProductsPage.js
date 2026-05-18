@@ -45,7 +45,7 @@ function ProductsPage() {
             return (
               <div key={p._id} style={{ borderRadius: 24, border: "1px solid rgba(245,166,35,0.12)", background: "rgba(245,166,35,0.03)", overflow: "hidden", display: "flex", flexDirection: "column" }}>
                 {p.image ? (
-                  <img src={"http://localhost:5001" + p.image} alt={p.name} style={{ width: "100%", height: 160, objectFit: "cover" }} />
+                  <img src={"http://localhost:5000" + p.image} alt={p.name} style={{ width: "100%", height: 160, objectFit: "cover" }} />
                 ) : (
                   <div style={{ width: "100%", height: 128, background: "rgba(245,166,35,0.05)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 40 }}>⚡</div>
                 )}

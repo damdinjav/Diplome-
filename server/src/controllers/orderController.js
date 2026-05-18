@@ -4,7 +4,12 @@ const Product = require("../models/Product");
 // Захиалга үүсгэх
 const createOrder = async (req, res) => {
   try {
-    const { productId, quantity, note } = req.body;
+    const { productId, quantity, note, address, phone, paymentMethod } = req.body;
+
+    // Шаардлагатай талбаруудыг шалгах
+    if (!address || !phone) {
+      return res.status(400).json({ message: "Хүргэх хаяг болон утасны дугаараа оруулна уу" });
+    }
 
     const product = await Product.findById(productId);
     if (!product) return res.status(404).json({ message: "Бүтээгдэхүүн олдсонгүй" });
@@ -18,6 +23,9 @@ const createOrder = async (req, res) => {
       quantity,
       totalPrice,
       note: note || "",
+      address,
+      phone,
+      paymentMethod: paymentMethod || "Карт",
     });
 
     product.stock -= quantity;
@@ -45,7 +53,7 @@ const getMyOrders = async (req, res) => {
 const getAllOrders = async (req, res) => {
   try {
     const orders = await Order.find()
-      .populate("product", "name brand")
+      .populate("product", "name brand image")
       .populate("user", "fullName email")
       .sort({ createdAt: -1 });
     res.json(orders);

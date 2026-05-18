@@ -74,7 +74,7 @@ function AdminDashboard() {
     setEditProduct(product);
     setForm({ name: product.name, brand: product.brand, powerKW: product.powerKW, type: product.type, price: product.price, stock: product.stock, description: product.description || "" });
     setImageFile(null);
-    setImagePreview(product.image ? `http://localhost:5001${product.image}` : "");
+    setImagePreview(product.image ? `http://localhost:5000${product.image}` : "");
     setFormError("");
     setModal(true);
   };
@@ -142,7 +142,7 @@ function AdminDashboard() {
       {/* Header */}
       <header style={{ background: "#F5A623", borderBottom: "1px solid #e8950f", position: "sticky", top: 0, zIndex: 40 }}>
         <div style={{ maxWidth: 1280, margin: "0 auto", padding: "12px 24px", display: "flex", alignItems: "center", gap: 16 }}>
-          <img src="/xac-logo.png" alt="ХАС" style={{ width: 44, height: 44, objectFit: "cover" }} />
+          <img src="/xac-logo.png" alt="ХАС" style={{ width: 48, height: 48, objectFit: "cover", flexShrink: 0, borderRadius: "50%" }} />
           <div style={{ width: 1, height: 32, background: "rgba(255,255,255,0.3)" }} />
           <div>
             <h1 style={{ fontWeight: 800, fontSize: 16, margin: 0, color: "#fff" }}>Админы самбар</h1>

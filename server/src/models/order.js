@@ -7,6 +7,16 @@ const orderSchema = new mongoose.Schema(
     quantity: { type: Number, required: true, min: 1 },
     totalPrice: { type: Number, required: true },
     note: { type: String, default: "" },
+
+    // Захиалга өгөх хэсгийн талбарууд (хуучин захиалгуудтай нийцтэй байхын тулд required: false)
+    address: { type: String, default: "" },
+    phone: { type: String, default: "" },
+    paymentMethod: {
+      type: String,
+      enum: ["Карт", "QPay"],
+      default: "Карт",
+    },
+
     status: {
       type: String,
       enum: ["Хүлээгдэж буй", "Батлагдсан", "Хүргэгдсэн", "Цуцлагдсан"],

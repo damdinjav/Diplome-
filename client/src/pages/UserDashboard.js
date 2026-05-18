@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ShoppingCart, Clock, XCircle, Search, Zap, User, LogOut } from "lucide-react";
+import { ShoppingCart, Clock, XCircle, Search, Zap, User, LogOut, MapPin, Phone, CreditCard } from "lucide-react";
 import Pagination from "../components/Pagination";
 import Footer from "../components/Footer";
 import API from "../services/api";
@@ -13,6 +13,7 @@ const STATUS_COLORS = {
   "Цуцлагдсан": { background: "#fef2f2", color: "#dc2626", border: "1px solid #fca5a5" },
 };
 
+const PAYMENT_METHODS = ["Карт", "QPay"];
 const ITEMS_PER_PAGE = 8;
 
 function UserDashboard() {
@@ -25,6 +26,9 @@ function UserDashboard() {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [note, setNote] = useState("");
+  const [address, setAddress] = useState("");
+  const [phone, setPhone] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("Карт");
   const [modal, setModal] = useState(false);
   const [message, setMessage] = useState("");
   const [activeTab, setActiveTab] = useState("products");
@@ -54,14 +58,37 @@ function UserDashboard() {
     setSelectedProduct(product);
     setQuantity(1);
     setNote("");
+    setAddress("");
+    setPhone("");
+    setPaymentMethod("Карт");
     setMessage("");
     setModal(true);
   };
 
   const handleOrder = async () => {
+    if (!address.trim()) {
+      setMessage("Хүргэх хаягаа оруулна уу");
+      return;
+    }
+    if (!phone.trim()) {
+      setMessage("Утасны дугаараа оруулна уу");
+      return;
+    }
+    if (!/^[0-9]{8,15}$/.test(phone.replace(/\s/g, ""))) {
+      setMessage("Зөв утасны дугаар оруулна уу");
+      return;
+    }
+
     try {
       setOrderLoading(true);
-      await API.post("/orders", { productId: selectedProduct._id, quantity, note });
+      await API.post("/orders", {
+        productId: selectedProduct._id,
+        quantity,
+        note,
+        address,
+        phone,
+        paymentMethod,
+      });
       setModal(false);
       setMessage("Захиалга амжилттай үүслээ!");
       await fetchData();
@@ -96,7 +123,6 @@ function UserDashboard() {
   return (
     <div style={{ minHeight: "100vh", background: "#f5f5f5", fontFamily: "sans-serif", color: "#222" }}>
 
-      {/* Top bar */}
       <div style={{ background: "#1a1a1a", padding: "6px 24px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <span style={{ fontSize: 12, color: "rgba(255,255,255,0.5)" }}>ХАС Генераторын онлайн захиалгын систем</span>
         <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
@@ -109,12 +135,14 @@ function UserDashboard() {
         </div>
       </div>
 
-      {/* Yellow Header */}
       <header style={{ background: "#F5A623", position: "sticky", top: 0, zIndex: 40 }}>
         <div style={{ maxWidth: 1280, margin: "0 auto", padding: "12px 24px", display: "flex", alignItems: "center", gap: 20 }}>
-          <img src="/xac-logo.png" alt="ХАС" style={{ width: 48, height: 48, objectFit: "cover", flexShrink: 0 }} />
-
-          {/* Search */}
+         <img
+  src="/xac-logo.png"
+  alt="ХАС"
+  onClick={() => window.location.reload()}
+  style={{ width: 48, height: 48, objectFit: "cover", flexShrink: 0, borderRadius: "50%", cursor: "pointer" }}
+/>
           <div style={{ flex: 1, display: "flex", maxWidth: 640 }}>
             <input
               value={search}
@@ -126,8 +154,6 @@ function UserDashboard() {
               <Search size={18} color="#fff" />
             </button>
           </div>
-
-          {/* My orders button */}
           <button
             onClick={() => setActiveTab("orders")}
             style={{ position: "relative", display: "flex", alignItems: "center", gap: 8, padding: "10px 18px", borderRadius: 8, border: "none", background: "rgba(0,0,0,0.15)", color: "#fff", fontWeight: 700, fontSize: 13, cursor: "pointer", flexShrink: 0 }}
@@ -140,8 +166,6 @@ function UserDashboard() {
             )}
           </button>
         </div>
-
-        {/* Nav tabs */}
         <div style={{ borderTop: "1px solid rgba(255,255,255,0.2)", padding: "0 24px", maxWidth: 1280, margin: "0 auto", display: "flex", gap: 0 }}>
           {["products", "orders"].map((tab) => (
             <button key={tab} onClick={() => setActiveTab(tab)} style={{
@@ -155,9 +179,10 @@ function UserDashboard() {
           ))}
         </div>
       </header>
+      
 
       <main style={{ maxWidth: 1280, margin: "0 auto", padding: "24px" }}>
-        {message && (
+        {message && !modal && (
           <div style={{ marginBottom: 16, borderRadius: 8, border: "1px solid #86efac", background: "#f0fdf4", padding: "12px 16px", fontSize: 14, color: "#16a34a" }}>
             ✅ {message}
           </div>
@@ -167,7 +192,6 @@ function UserDashboard() {
           <div style={{ display: "flex", height: 200, alignItems: "center", justifyContent: "center", color: "#999", fontSize: 16 }}>Уншиж байна...</div>
         ) : (
           <>
-            {/* Products Tab */}
             {activeTab === "products" && (
               <>
                 <div style={{ marginBottom: 16, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -223,7 +247,6 @@ function UserDashboard() {
               </>
             )}
 
-            {/* Orders Tab */}
             {activeTab === "orders" && (
               <>
                 <h2 style={{ fontWeight: 700, fontSize: 18, marginBottom: 16 }}>Миний захиалгууд</h2>
@@ -235,14 +258,31 @@ function UserDashboard() {
                 ) : (
                   <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                     {paginatedOrders.map((o) => (
-                      <div key={o._id} style={{ background: "#fff", borderRadius: 8, border: "1px solid #e5e7eb", padding: 16, display: "flex", alignItems: "center", gap: 16 }}>
+                      <div key={o._id} style={{ background: "#fff", borderRadius: 8, border: "1px solid #e5e7eb", padding: 16, display: "flex", alignItems: "flex-start", gap: 16 }}>
                         {o.product?.image && (
                           <img src={"http://localhost:5000" + o.product.image} alt={o.product?.name} style={{ width: 80, height: 80, objectFit: "cover", borderRadius: 8, border: "1px solid #e5e7eb", flexShrink: 0 }} />
                         )}
                         <div style={{ flex: 1 }}>
                           <p style={{ fontWeight: 700, fontSize: 15, margin: "0 0 4px" }}>{o.product?.name}</p>
-                          <p style={{ fontSize: 13, color: "#666", margin: "0 0 4px" }}>{o.quantity} ширхэг · <span style={{ color: "#e8950f", fontWeight: 700 }}>{o.totalPrice.toLocaleString()}₮</span></p>
-                          {o.note && <p style={{ fontSize: 12, color: "#999", margin: "0 0 4px" }}>"{o.note}"</p>}
+                          <p style={{ fontSize: 13, color: "#666", margin: "0 0 6px" }}>{o.quantity} ширхэг · <span style={{ color: "#e8950f", fontWeight: 700 }}>{o.totalPrice.toLocaleString()}₮</span></p>
+
+                          {o.address && (
+                            <p style={{ fontSize: 12, color: "#666", margin: "0 0 3px", display: "flex", alignItems: "center", gap: 4 }}>
+                              <MapPin size={11} /> {o.address}
+                            </p>
+                          )}
+                          {o.phone && (
+                            <p style={{ fontSize: 12, color: "#666", margin: "0 0 3px", display: "flex", alignItems: "center", gap: 4 }}>
+                              <Phone size={11} /> {o.phone}
+                            </p>
+                          )}
+                          {o.paymentMethod && (
+                            <p style={{ fontSize: 12, color: "#666", margin: "0 0 3px", display: "flex", alignItems: "center", gap: 4 }}>
+                              <CreditCard size={11} /> {o.paymentMethod}
+                            </p>
+                          )}
+
+                          {o.note && <p style={{ fontSize: 12, color: "#999", margin: "0 0 3px" }}>"{o.note}"</p>}
                           <p style={{ fontSize: 11, color: "#bbb", margin: 0 }}>{new Date(o.createdAt).toLocaleDateString("mn-MN")}</p>
                         </div>
                         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8 }}>
@@ -266,17 +306,14 @@ function UserDashboard() {
 
       <Footer />
 
-      {/* Order Modal */}
       {modal && selectedProduct && (
         <div style={{ position: "fixed", inset: 0, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.5)", padding: 16 }}>
-          <div style={{ width: "100%", maxWidth: 480, borderRadius: 12, background: "#fff", overflow: "hidden", boxShadow: "0 25px 60px rgba(0,0,0,0.3)" }}>
-            {/* Modal header */}
-            <div style={{ background: "#F5A623", padding: "16px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ width: "100%", maxWidth: 480, borderRadius: 12, background: "#fff", overflow: "hidden", boxShadow: "0 25px 60px rgba(0,0,0,0.3)", maxHeight: "90vh", overflowY: "auto" }}>
+            <div style={{ background: "#F5A623", padding: "16px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0 }}>
               <h2 style={{ fontWeight: 800, fontSize: 16, margin: 0, color: "#fff" }}>Захиалга өгөх</h2>
               <button onClick={() => setModal(false)} style={{ background: "none", border: "none", color: "#fff", cursor: "pointer", fontSize: 20, lineHeight: 1 }}>×</button>
             </div>
-            <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 16 }}>
-              {/* Product info */}
+            <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 14 }}>
               <div style={{ display: "flex", gap: 12, background: "#f9f9f9", borderRadius: 8, padding: 12, border: "1px solid #e5e7eb" }}>
                 {selectedProduct.image && (
                   <img src={"http://localhost:5000" + selectedProduct.image} alt={selectedProduct.name} style={{ width: 80, height: 80, objectFit: "cover", borderRadius: 6 }} />
@@ -289,20 +326,64 @@ function UserDashboard() {
               </div>
 
               <div>
-                <label style={{ fontSize: 13, fontWeight: 600, color: "#444", display: "block", marginBottom: 6 }}>Тоо ширхэг</label>
+                <label style={{ fontSize: 13, fontWeight: 600, color: "#444", display: "block", marginBottom: 6 }}>Тоо ширхэг *</label>
                 <input type="number" min={1} max={selectedProduct.stock} value={quantity} onChange={(e) => setQuantity(Number(e.target.value))}
                   style={{ width: "100%", borderRadius: 6, border: "1.5px solid #e5e7eb", padding: "10px 14px", fontSize: 14, outline: "none", boxSizing: "border-box" }}
-                  onFocus={(e) => e.target.style.border = "1.5px solid #F5A623"}
-                  onBlur={(e) => e.target.style.border = "1.5px solid #e5e7eb"}
                 />
               </div>
 
               <div>
+                <label style={{ fontSize: 13, fontWeight: 600, color: "#444", display: "flex", alignItems: "center", gap: 4, marginBottom: 6 }}>
+                  <MapPin size={13} /> Хүргэх хаяг *
+                </label>
+                <textarea value={address} onChange={(e) => setAddress(e.target.value)} rows={2}
+                  placeholder="Жишээ: Улаанбаатар, Сүхбаатар дүүрэг, 1-р хороо, 25-р байр, 14 тоот"
+                  style={{ width: "100%", borderRadius: 6, border: "1.5px solid #e5e7eb", padding: "10px 14px", fontSize: 14, outline: "none", resize: "none", boxSizing: "border-box", fontFamily: "sans-serif" }}
+                />
+              </div>
+
+              <div>
+                <label style={{ fontSize: 13, fontWeight: 600, color: "#444", display: "flex", alignItems: "center", gap: 4, marginBottom: 6 }}>
+                  <Phone size={13} /> Утасны дугаар *
+                </label>
+                <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)}
+                  placeholder="Жишээ: 99112233"
+                  style={{ width: "100%", borderRadius: 6, border: "1.5px solid #e5e7eb", padding: "10px 14px", fontSize: 14, outline: "none", boxSizing: "border-box" }}
+                />
+              </div>
+
+              <div>
+                <label style={{ fontSize: 13, fontWeight: 600, color: "#444", display: "flex", alignItems: "center", gap: 4, marginBottom: 6 }}>
+                  <CreditCard size={13} /> Төлбөрийн хэлбэр *
+                </label>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                  {PAYMENT_METHODS.map((method) => (
+                    <button
+                      key={method}
+                      type="button"
+                      onClick={() => setPaymentMethod(method)}
+                      style={{
+                        borderRadius: 6,
+                        border: paymentMethod === method ? "2px solid #F5A623" : "1.5px solid #e5e7eb",
+                        background: paymentMethod === method ? "#fff8e1" : "#fff",
+                        padding: "12px",
+                        fontSize: 14,
+                        fontWeight: 700,
+                        color: paymentMethod === method ? "#e8950f" : "#555",
+                        cursor: "pointer",
+                        textAlign: "center",
+                      }}
+                    >
+                      {method}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
                 <label style={{ fontSize: 13, fontWeight: 600, color: "#444", display: "block", marginBottom: 6 }}>Тэмдэглэл (заавал биш)</label>
-                <textarea value={note} onChange={(e) => setNote(e.target.value)} rows={3} placeholder="Нэмэлт хүсэлт..."
-                  style={{ width: "100%", borderRadius: 6, border: "1.5px solid #e5e7eb", padding: "10px 14px", fontSize: 14, outline: "none", resize: "none", boxSizing: "border-box" }}
-                  onFocus={(e) => e.target.style.border = "1.5px solid #F5A623"}
-                  onBlur={(e) => e.target.style.border = "1.5px solid #e5e7eb"}
+                <textarea value={note} onChange={(e) => setNote(e.target.value)} rows={2} placeholder="Нэмэлт хүсэлт..."
+                  style={{ width: "100%", borderRadius: 6, border: "1.5px solid #e5e7eb", padding: "10px 14px", fontSize: 14, outline: "none", resize: "none", boxSizing: "border-box", fontFamily: "sans-serif" }}
                 />
               </div>
 

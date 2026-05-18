@@ -50,7 +50,7 @@ function AdminOrdersPage() {
             <div key={o._id} style={{ borderRadius: 20, border: "1px solid rgba(245,166,35,0.12)", background: "white", padding: 20, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
               <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
                 {o.product?.image && (
-                  <img src={"http://localhost:5001" + o.product.image} alt={o.product.name} style={{ width: 56, height: 56, borderRadius: 12, objectFit: "cover", border: "1px solid #e5e7eb" }} />
+                  <img src={"http://localhost:5000" + o.product.image} alt={o.product.name} style={{ width: 56, height: 56, borderRadius: 12, objectFit: "cover", border: "1px solid #e5e7eb" }} />
                 )}
                 <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                   <p style={{ fontWeight: 600, margin: 0, color: "#111827" }}>{o.product?.name}</p>

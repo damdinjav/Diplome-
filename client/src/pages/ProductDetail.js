@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ShoppingCart, ArrowLeft, Zap, Package, Tag, Layers } from "lucide-react";
+import { ShoppingCart, ArrowLeft, Zap, Package, Tag, Layers, MapPin, Phone, CreditCard } from "lucide-react";
 import API from "../services/api";
+
+const PAYMENT_METHODS = ["Карт", "QPay"];
 
 function ProductDetail() {
   const { id } = useParams();
@@ -10,6 +12,9 @@ function ProductDetail() {
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [note, setNote] = useState("");
+  const [address, setAddress] = useState("");
+  const [phone, setPhone] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("Карт");
   const [orderLoading, setOrderLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -29,10 +34,38 @@ function ProductDetail() {
   }, [id]);
 
   const handleOrder = async () => {
+    setMessage("");
+    setError("");
+
+    if (!address.trim()) {
+      setError("Хүргэх хаягаа оруулна уу");
+      return;
+    }
+    if (!phone.trim()) {
+      setError("Утасны дугаараа оруулна уу");
+      return;
+    }
+    if (!/^[0-9]{8,15}$/.test(phone.replace(/\s/g, ""))) {
+      setError("Зөв утасны дугаар оруулна уу");
+      return;
+    }
+
     try {
       setOrderLoading(true);
-      await API.post("/orders", { productId: product._id, quantity, note });
+      await API.post("/orders", {
+        productId: product._id,
+        quantity,
+        note,
+        address,
+        phone,
+        paymentMethod,
+      });
       setMessage("Захиалга амжилттай үүслээ! 🎉");
+      // Талбаруудыг цэвэрлэх
+      setAddress("");
+      setPhone("");
+      setNote("");
+      setQuantity(1);
     } catch (err) {
       setError(err.response?.data?.message || "Алдаа гарлаа");
     } finally {
@@ -59,7 +92,7 @@ function ProductDetail() {
       <header style={{ background: "#fff", borderBottom: "1px solid #e5e7eb", position: "sticky", top: 0, zIndex: 40 }}>
         <div style={{ maxWidth: 1280, margin: "0 auto", padding: "12px 24px", display: "flex", alignItems: "center", gap: 16 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <img src="/xac-logo.png" alt="ХАС" style={{ width: 36, height: 36, borderRadius: "50%", objectFit: "cover" }} />
+            <img src="/xac-logo.png" alt="ХАС" style={{ width: 48, height: 48, objectFit: "cover", flexShrink: 0, borderRadius: "50%" }} />
             <span style={{ fontWeight: 900, fontSize: 16, letterSpacing: 2 }}>ХАС</span>
           </div>
           <button onClick={() => navigate(-1)} style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "1px solid #e5e7eb", borderRadius: 8, padding: "8px 16px", fontSize: 13, fontWeight: 600, color: "#555", cursor: "pointer" }}>
@@ -82,7 +115,7 @@ function ProductDetail() {
           {/* Left - Image */}
           <div>
             {product.image ? (
-              <img src={"http://localhost:5001" + product.image} alt={product.name} style={{ width: "100%", borderRadius: 12, border: "1px solid #e5e7eb", objectFit: "cover", maxHeight: 400 }} />
+              <img src={"http://localhost:5000" + product.image} alt={product.name} style={{ width: "100%", borderRadius: 12, border: "1px solid #e5e7eb", objectFit: "cover", maxHeight: 400 }} />
             ) : (
               <div style={{ width: "100%", height: 400, background: "#f9f9f9", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 80, border: "1px solid #e5e7eb" }}>⚡</div>
             )}
@@ -136,10 +169,12 @@ function ProductDetail() {
 
             {/* Order section */}
             {product.stock > 0 && (
-              <div style={{ display: "flex", flexDirection: "column", gap: 12, background: "#fffbf0", borderRadius: 10, padding: 16, border: "1px solid #fde68a" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 14, background: "#fffbf0", borderRadius: 10, padding: 18, border: "1px solid #fde68a" }}>
+
+                {/* Тоо ширхэг */}
+                <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
                   <label style={{ fontSize: 13, fontWeight: 600, color: "#555", flexShrink: 0 }}>Тоо ширхэг:</label>
-                  <div style={{ display: "flex", alignItems: "center", gap: 0, border: "1px solid #e5e7eb", borderRadius: 6, overflow: "hidden" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 0, border: "1px solid #e5e7eb", borderRadius: 6, overflow: "hidden", background: "#fff" }}>
                     <button onClick={() => setQuantity(q => Math.max(1, q - 1))} style={{ width: 36, height: 36, background: "#f5f5f5", border: "none", fontSize: 18, cursor: "pointer", color: "#555" }}>−</button>
                     <span style={{ width: 48, textAlign: "center", fontSize: 15, fontWeight: 700 }}>{quantity}</span>
                     <button onClick={() => setQuantity(q => Math.min(product.stock, q + 1))} style={{ width: 36, height: 36, background: "#f5f5f5", border: "none", fontSize: 18, cursor: "pointer", color: "#555" }}>+</button>
@@ -147,8 +182,64 @@ function ProductDetail() {
                   <span style={{ fontSize: 13, color: "#999" }}>Нийт: <strong style={{ color: "#e8950f" }}>{(product.price * quantity).toLocaleString()}₮</strong></span>
                 </div>
 
+                {/* ⭐ Хүргэх хаяг */}
+                <div>
+                  <label style={{ fontSize: 13, fontWeight: 600, color: "#444", display: "flex", alignItems: "center", gap: 4, marginBottom: 6 }}>
+                    <MapPin size={13} /> Хүргэх хаяг *
+                  </label>
+                  <textarea value={address} onChange={(e) => setAddress(e.target.value)} rows={2}
+                    placeholder="Жишээ: Улаанбаатар, Сүхбаатар дүүрэг, 1-р хороо, 25-р байр, 14 тоот"
+                    style={{ width: "100%", borderRadius: 6, border: "1.5px solid #e5e7eb", padding: "10px 12px", fontSize: 13, outline: "none", resize: "none", fontFamily: "sans-serif", boxSizing: "border-box", background: "#fff" }}
+                    onFocus={(e) => e.target.style.border = "1.5px solid #F5A623"}
+                    onBlur={(e) => e.target.style.border = "1.5px solid #e5e7eb"}
+                  />
+                </div>
+
+                {/* ⭐ Утасны дугаар */}
+                <div>
+                  <label style={{ fontSize: 13, fontWeight: 600, color: "#444", display: "flex", alignItems: "center", gap: 4, marginBottom: 6 }}>
+                    <Phone size={13} /> Утасны дугаар *
+                  </label>
+                  <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)}
+                    placeholder="Жишээ: 99112233"
+                    style={{ width: "100%", borderRadius: 6, border: "1.5px solid #e5e7eb", padding: "10px 12px", fontSize: 13, outline: "none", boxSizing: "border-box", background: "#fff" }}
+                    onFocus={(e) => e.target.style.border = "1.5px solid #F5A623"}
+                    onBlur={(e) => e.target.style.border = "1.5px solid #e5e7eb"}
+                  />
+                </div>
+
+                {/* ⭐ Төлбөрийн хэлбэр */}
+                <div>
+                  <label style={{ fontSize: 13, fontWeight: 600, color: "#444", display: "flex", alignItems: "center", gap: 4, marginBottom: 6 }}>
+                    <CreditCard size={13} /> Төлбөрийн хэлбэр *
+                  </label>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                    {PAYMENT_METHODS.map((method) => (
+                      <button
+                        key={method}
+                        type="button"
+                        onClick={() => setPaymentMethod(method)}
+                        style={{
+                          borderRadius: 6,
+                          border: paymentMethod === method ? "2px solid #F5A623" : "1.5px solid #e5e7eb",
+                          background: paymentMethod === method ? "#fff8e1" : "#fff",
+                          padding: "10px 12px",
+                          fontSize: 13,
+                          fontWeight: 700,
+                          color: paymentMethod === method ? "#e8950f" : "#555",
+                          cursor: "pointer",
+                          textAlign: "center",
+                        }}
+                      >
+                        {method}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Тэмдэглэл */}
                 <textarea value={note} onChange={(e) => setNote(e.target.value)} rows={2} placeholder="Тэмдэглэл (заавал биш)..."
-                  style={{ borderRadius: 6, border: "1px solid #e5e7eb", padding: "8px 12px", fontSize: 13, outline: "none", resize: "none", fontFamily: "sans-serif" }}
+                  style={{ borderRadius: 6, border: "1px solid #e5e7eb", padding: "8px 12px", fontSize: 13, outline: "none", resize: "none", fontFamily: "sans-serif", background: "#fff" }}
                   onFocus={(e) => e.target.style.border = "1px solid #F5A623"}
                   onBlur={(e) => e.target.style.border = "1px solid #e5e7eb"}
                 />
